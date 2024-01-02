@@ -18,14 +18,18 @@ function getAllLAunches() {
 
 function addNewLaunch(launch) {
   latestFlightNumber++;
-  launches.set(latestFlightNumber, {
-    ...launch,
+
+  // Directly modify the launch object
+  Object.assign(launch, {
     success: true,
     upcoming: true,
     customers: ["AB64", "NASA", "Space X"],
     flightNumber: latestFlightNumber,
   });
+
+  launches.set(latestFlightNumber, launch);
 }
+
 module.exports = {
   getAllLAunches,
   addNewLaunch,
