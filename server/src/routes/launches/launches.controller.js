@@ -31,7 +31,7 @@ function httpAddNewLaunch(req, res) {
 }
 
 function httpDeleteLaunch(req, res) {
-  return res.status(204).json(deleteLaunch(req.body.flightNumber));
+  return res.status(200).json(deleteLaunch(req.params.id));
 }
 
 module.exports = {
