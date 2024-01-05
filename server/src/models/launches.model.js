@@ -30,7 +30,12 @@ function addNewLaunch(launch) {
   launches.set(latestFlightNumber, launch);
 }
 
+function deleteLaunch(flightNumber) {
+  launches.delete(Number(flightNumber));
+}
+
 module.exports = {
   getAllLAunches,
   addNewLaunch,
+  deleteLaunch,
 };

@@ -1,4 +1,8 @@
-const { getAllLAunches, addNewLaunch } = require("../../models/launches.model");
+const {
+  getAllLAunches,
+  addNewLaunch,
+  deleteLaunch,
+} = require("../../models/launches.model");
 
 function httpGetAllLaunches(req, res) {
   return res.status(200).json(getAllLAunches());
@@ -26,7 +30,12 @@ function httpAddNewLaunch(req, res) {
   return res.status(201).json(launch);
 }
 
+function httpDeleteLaunch(req, res) {
+  return res.status(204).json(deleteLaunch(req.body.flightNumber));
+}
+
 module.exports = {
   httpGetAllLaunches,
   httpAddNewLaunch,
+  httpDeleteLaunch,
 };
