@@ -2,7 +2,8 @@ const launchesDB = require("./launches.mongo");
 const planets = require("./planets.mongo");
 
 const launches = new Map();
-let latestFlightNumber = 100;
+const DEFAULT_FLIGHT_NUMBER = 100;
+
 const launch = {
   flightNumber: 100,
   mission: "Kepler Exploration 2000",
@@ -18,17 +19,24 @@ saveLaunch(launch);
 function existLaunchWithId(launchId) {
   return launches.has(launchId);
 }
+async function getLatestFlightNumber() {
+  const latestLaunch = await launchesDB.findOne().sort("-flightNumber");
+  if (!latestLaunch) {
+    return DEFAULT_FLIGHT_NUMBER;
+  }
+  return latestLaunch.flightNumber;
+}
 async function getAllLAunches() {
-  return await launchesDB.find({},{ _id: 0, __v: 0 });
+  return await launchesDB.find({}, { _id: 0, __v: 0 });
 }
 
 async function saveLaunch(launch) {
   const planet = await planets.findOne({ keplerName: launch.target });
-  
-  if(!planet) {
+
+  if (!planet) {
     throw new Error("No matching planet found");
   }
-  
+
   await launchesDB.updateOne(
     {
       flightNumber: launch.flightNumber,
@@ -40,19 +48,17 @@ async function saveLaunch(launch) {
   );
 }
 
-function addNewLaunch(launch) {
-  latestFlightNumber++;
-
-  // Directly modify the launch object
-  Object.assign(launch, {
+async function scheduleNewLaunch(launch) {
+  const newFlightNumber = (await getLatestFlightNumber()) + 1;
+  const newLaunch = Object.assign(launch, {
     success: true,
     upcoming: true,
     customers: ["AB64", "NASA", "Space X"],
-    flightNumber: latestFlightNumber,
+    flightNumber: newFlightNumber,
   });
-
-  launches.set(latestFlightNumber, launch);
+  await saveLaunch(newLaunch);
 }
+
 
 function abortLaunchById(launchId) {
   const aborted = launches.get(launchId);
@@ -64,6 +70,6 @@ function abortLaunchById(launchId) {
 module.exports = {
   existLaunchWithId,
   getAllLAunches,
-  addNewLaunch,
+  scheduleNewLaunch,
   abortLaunchById,
 };
