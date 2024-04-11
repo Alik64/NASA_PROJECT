@@ -18,7 +18,7 @@ const launch = {
 saveLaunch(launch);
 
 const SPACEX_LAUNCHES_API_URL = "https://api.spacexdata.com/v4/launches/query";
- async function loadingLaunchesData() {
+ async function loadLaunchData() {
    console.log("Downloading launch data...");
    const response = await axios.post(SPACEX_LAUNCHES_API_URL, {
      query: {},
@@ -40,8 +40,24 @@ const SPACEX_LAUNCHES_API_URL = "https://api.spacexdata.com/v4/launches/query";
        ],
      },
    });
-   console.log(response.data.docs[0].name);
+   const launchDocs = response.data.docs;
 
+   for (const launchDoc of launchDocs) {
+     const payloads = launchDoc["payloads"];
+     const customers = payloads.flatMap((payload) => {
+       return payload["customers"];
+     });
+     const launch = {
+       flightNumber: launchDoc["flight_number"],
+       mission: launchDoc["name"],
+       rocket: launchDoc["rocket"]["name"],
+       launchDate: launchDoc["date_local"],
+       upcoming: launchDoc["upcoming"],
+       success: launchDoc["success"],
+       customers,
+     };
+    console.log(`${launch.flightNumber} ${launch.mission}`);
+   }
  }
 async function existLaunchWithId(launchId) {
   return await launchesDB.findOne({ flightNumber: launchId });
@@ -100,7 +116,7 @@ async function abortLaunchById(launchId) {
 }
 
 module.exports = {
-  loadingLaunchesData,
+  loadLaunchData,
   existLaunchWithId,
   getAllLAunches,
   scheduleNewLaunch,
