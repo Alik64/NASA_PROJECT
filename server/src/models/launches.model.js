@@ -59,8 +59,12 @@ const SPACEX_LAUNCHES_API_URL = "https://api.spacexdata.com/v4/launches/query";
     console.log(`${launch.flightNumber} ${launch.mission}`);
    }
  }
+
+ async function findLaunch(filter){
+  return await launchesDB.findOne(filter);
+ }
 async function existLaunchWithId(launchId) {
-  return await launchesDB.findOne({ flightNumber: launchId });
+  return await findLaunch({ flightNumber: launchId });
 }
 async function getLatestFlightNumber() {
   const latestLaunch = await launchesDB.findOne().sort("-flightNumber");
