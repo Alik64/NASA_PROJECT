@@ -8,4 +8,4 @@ const api = express.Router();
 api.use("/planets", planetsRouter);
 api.use("/launches", launchesRouter);
 
-module.exports = api
+module.exports = api;
